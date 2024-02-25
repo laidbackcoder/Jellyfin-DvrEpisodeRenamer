@@ -1,3 +1,32 @@
+"""Jellyfin DVR Episode Renamer
+
+This application can be used to automatically rename a Jellyfin recorded TV
+file using the metadata stored in a .inf file which is automatically saved
+alongside the video file by Jellyfin's DVR functionality.
+
+Version: 1.0.0
+License: MIT License
+URL: https://github.com/laidbackcoder/Jellyfin-DvrEpisodeRenamer
+
+Help Message (-h):
+
+    usage: Jellyfin-DvrEpisodeRenamer.py [-h] [-d | -r]
+                                        [-e {.ts,.mp4,.m4v}] path
+
+    Auto Rename Jellyfin TV Show Recordings (DVR)
+
+    positional arguments:
+    path                  Path to File or Directory to Process
+
+    options:
+    -h, --help            show this help message and exit
+    -d, --delete          Delete the episiode info file and thumbnail
+                            after processing
+    -r, --rename          Rename the episiode info file and thumbnail after
+                            processing (default)
+    -e {.ts,.mp4,.m4v}, --extension {.ts,.mp4,.m4v}
+                            Video File Extension (default: .ts)
+"""
 import argparse
 import os
 import re
@@ -5,11 +34,19 @@ import xml.etree.ElementTree as xmlET
 
 
 # TODO: Move to config file
-# [('originl1','substitute1'),('originl2','substitute2'),..]
+# [('original1','substitute1'),('original2','substitute2'),..]
 SUBSTITUTION_SHOW_NAMES = [('Rick and Morty [adult swim]', 'Rick and Morty')]
 
 
 def process_file(video_file_path):
+    """Process a specified Video File
+
+    Args:
+        video_file_path (string): Video File Path
+
+    Raises:
+        Exception: Generic Exception with Message
+    """
     try:
         video_file_name = os.path.basename(video_file_path)
         path = os.path.dirname(video_file_path)
@@ -80,7 +117,7 @@ def process_file(video_file_path):
 
                             # Check if the episiode info file and thumbnail should be deleted or renamed
                             if (DELETE_INFO_AND_THUMBNAIL_FILES):
-                                # Delete the episiode info file and thumbnail
+                                # Delete the episode info file and thumbnail
                                 try:
                                     print('Deleting Info File:', info_file_name)
                                     os.remove(info_file_path)
@@ -121,6 +158,14 @@ def process_file(video_file_path):
 
 
 def process_directory(root_directory):
+    """Process Video Files and Sub Directories in a specified directory
+
+    Args:
+        root_directory (string): Directory Path
+
+    Raises:
+        Exception: Generic Exception with Message
+    """
 
     global success
     global errors
@@ -153,7 +198,7 @@ errors = 0
 success = 0
 
 # Configure the Command Line Arguments
-parser = argparse.ArgumentParser(description = 'Auto Rename Jellyfin TV Show Recordings (DVR)')
+parser = argparse.ArgumentParser(description='Auto Rename Jellyfin TV Show Recordings (DVR)')
 group = parser.add_mutually_exclusive_group()
 parser.add_argument('path', type=str, help='Path to File or Directory to Process')
 group.add_argument('-d', '--delete', action='store_true', help='Delete the episiode info file and thumbnail after processing')
@@ -169,7 +214,7 @@ if args.delete:
 else:
     DELETE_INFO_AND_THUMBNAIL_FILES = False
 
-#Check valid path has been supplied
+# Check valid path has been supplied
 if (os.path.exists(path)):
     # Check if the path is to a directory or a file
     if os.path.isdir(path):
