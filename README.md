@@ -12,6 +12,9 @@ There are two modes of processing:
 
 This is determined by the path supplied to the application when executed.
 
+By default the application looks for .ts files, however .mp4 & .m4v files can be
+specified.
+
 
 The associated meta data files (episode info and thumbnail) will also be renamed
 unless the delete option has been used, in which case they will be deleted.
