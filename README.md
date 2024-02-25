@@ -32,3 +32,10 @@ unless the delete option has been used, in which case they will be deleted.
       -r, --rename          Rename the episiode info file and thumbnail after processing (default)
       -e {.ts,.mp4,.m4v}, --extension {.ts,.mp4,.m4v}
                             Video File Extension (default: .ts)
+
+## Automation
+
+### Jellyfin
+Jellyfin can be configured to call the application once a recording has finished:
+
+_Dashboard > Live TV > Digital Recorder > Recording Post Processing_
