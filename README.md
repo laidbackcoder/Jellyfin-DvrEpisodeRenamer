@@ -3,7 +3,7 @@ Auto Rename Jellyfin DVR TV Show Recordings
 
     usage: Jellyfin-DvrEpisodeRenamer.py [-h] [-d | -r] [-e {.ts,.mp4,.m4v}] path
 
-    Auto Rename Jellyfin DVR TV Show Recordings
+    Auto Rename Jellyfin TV Show Recordings (DVR)
 
     positional arguments:
       path                  Path to File or Directory to Process
