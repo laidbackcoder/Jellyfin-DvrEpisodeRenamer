@@ -86,7 +86,7 @@ def process_file(video_file_path):
                     plot = xmlET.parse(info_file_path).getroot().find('plot').text
 
                     # Use regular expression to extract season and episode number from the plot text (adding leading zeroes if needed)
-                    match = re.search(r'\(S(\d+)\s*Ep(\d+)', plot)
+                    match = re.search(r'S(\d+)\s*Ep(\d+)', plot)
                     if match:
                         season = match.group(1).zfill(2)
                         episode = match.group(2).zfill(2)
