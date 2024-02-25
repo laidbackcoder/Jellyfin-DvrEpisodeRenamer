@@ -1,14 +1,14 @@
 # Jellyfin-DvrEpisodeRenamer
 
 This application can be used to automatically rename a Jellyfin recorded TV
-file using the metadata stored in a .inf file which is saved alongside the 
+file using the metadata stored in a .inf file which is saved alongside the
 video file by Jellyfin's DVR functionality.
 
 
 There are two modes of processing:
 
 * Single Video file
-* Whole directoy (incluiding sub-directories)
+* Whole directory (including sub-directories)
 
 This is determined by the path supplied to the application when executed.
 
