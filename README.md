@@ -1,6 +1,6 @@
 # Jellyfin-DvrEpisodeRenamer
 
-This application can be used to automatically rename a Jellyfin recorded TV
+This application can be used to automatically rename a [Jellyfin](https://github.com/jellyfin/jellyfin "JellyFin on GitHub") recorded TV
 file using the metadata stored in a .nfo file which is saved alongside the
 video file by Jellyfin's DVR functionality.
 
@@ -41,7 +41,7 @@ options:
 ## Automation
 
 ### Jellyfin
-[Jellyfin](https://github.com/jellyfin/jellyfin "JellyFin on GitHub") can be configured to call the application once a recording has finished:
+Jellyfin can be configured to call the application once a recording has finished:
 
 _Dashboard > Live TV > Digital Recorder > Recording Post Processing_
 
@@ -77,4 +77,4 @@ if [ "$CONVERSION_STATUS" -eq 0 ]; then
     python3 /config/hooks/Jellyfin-DvrEpisodeRenamer.py "$CONVERTED_FILE" -e .mp4 -d
 fi
 ```
-This script will be executed once transcoding has been completed.
+In this example the .mp4 file will be renamed, and the episode info and thumbnail image will be deleted (because of the '-d' option)
