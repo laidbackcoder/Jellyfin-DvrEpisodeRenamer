@@ -69,7 +69,7 @@ _Dashboard > Live TV > Digital Recorder > Recording Post Processing_
 
 ### Docker-Post-Recording
 
-I am a big fan of the [docker-post-recording](https://github.com/chacawaca/docker-post-recording "docker-post-recording on GitHub") project and us it to automatically remove commercials and transcode my recordings to a .mp4 file. It is possible to configure the tool to execute the Jellyfin-DvrEpisodeRenamer script automatically once the transcoding has been finished:
+I am a big fan of the [docker-post-recording](https://github.com/chacawaca/docker-post-recording "docker-post-recording on GitHub") project and us it to automatically remove commercials and transcode my recordings to a .mp4 file. It is possible to configure the tool to execute the Jellyfin-DvrEpisodeRenamer script automatically once the transcoding has finished:
 
 Copy the Jellyfin-DvrEpisodeRenamer.py file to the hooks directory in the docker container's config folder:
 
