@@ -35,7 +35,7 @@ import xml.etree.ElementTree as xmlET
 
 # TODO: Move to config file
 # [('original1','substitute1'),('original2','substitute2'),..]
-SUBSTITUTION_SHOW_NAMES = [('Rick and Morty [adult swim]', 'Rick and Morty')]
+SUBSTITUTION_SHOW_NAMES = []
 
 
 def process_file(video_file_path):
