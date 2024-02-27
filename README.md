@@ -45,7 +45,7 @@ options:
 In this example, we are processing a single .ts file and deleting the episode info and thumbnail files upon successful completion:
 
 ```Bash
-python3 Jellyfin-DvrEpisodeRenamer.py ".../TV Shows/The Big Bang Theory/The Big Bang Theory 2020702271000.mp4" -d
+python3 Jellyfin-DvrEpisodeRenamer.py ".../TV Shows/The Big Bang Theory/The Big Bang Theory 2020702271000.ts" -d
 ```
 
 
@@ -54,7 +54,7 @@ python3 Jellyfin-DvrEpisodeRenamer.py ".../TV Shows/The Big Bang Theory/The Big 
 In this example, we are processing all .mp4 files in the specified directory (including sub-directories) and renaming the episode info and thumbnail files upon successful completion:
 
 ```Bash
-python3 Jellyfin-DvrEpisodeRenamer.py ".../TV Shows" -e .mp4
+python3 Jellyfin-DvrEpisodeRenamer.py ".../TV Shows" -e .mp4 -r
 ```
 
 
