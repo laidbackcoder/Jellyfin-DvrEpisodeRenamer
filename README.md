@@ -4,7 +4,7 @@ This application can be used to automatically rename a [Jellyfin](https://github
 file using the metadata stored in a .nfo file which is saved alongside the
 video file by Jellyfin's DVR functionality.
 
-The format will be '[Show Name] - S[Season No]E[Episode No].[extension]', e.g. 'The Big Bang Theory - S01E10.mp4'.
+>NOTE: The format will be `'[Show Name] - S[Season No]E[Episode No].[extension]'` e.g. 'The Big Bang Theory - S01E10.mp4'.
 
 
 There are two modes of processing:
@@ -80,3 +80,17 @@ if [ "$CONVERSION_STATUS" -eq 0 ]; then
 fi
 ```
 In this example the .mp4 file will be renamed, and the episode info and thumbnail image will be deleted (because of the '-d' option)
+
+
+## Show Name Substitution
+
+There is a section of the python script that can be used to substitute one show name for another:
+
+e.g.
+
+```Python
+# [('original1','substitute1'),('original2','substitute2'),..]
+SUBSTITUTION_SHOW_NAMES = [('Rick and Morty [adult swim]', 'Rick and Morty')]
+```
+
+>NOTE: This will be moved to a config file in a future release.
