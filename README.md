@@ -112,5 +112,5 @@ SUBSTITUTION_SHOW_NAMES = [('Rick and Morty [adult swim]', 'Rick and Morty')]
 ```
 
 
-[^1]: Please Note: this has only been tested with UK Recrdings.
-[^2]: This will be moved to a config file in a future release. 
+[^1]: Please Note: this has only been tested with UK Recordings.
+[^2]: This will be moved to a config file in a future release.
