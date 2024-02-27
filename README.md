@@ -4,6 +4,8 @@ This application can be used to automatically rename a [Jellyfin](https://github
 file using the metadata stored in a .nfo file which is saved alongside the
 video file by Jellyfin's DVR functionality.
 
+The format will be '[Show Name] - S[Season No]E[Episode No].[extension]', e.g. 'The Big Bang Theory - S01E10.mp4'.
+
 
 There are two modes of processing:
 
