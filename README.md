@@ -45,7 +45,7 @@ options:
 In this example, we are processing a single .ts file and deleting the episode info and thumbnail files upon successful completion:
 
 ```Bash
-python3 Jellyfin-DvrEpisodeRenamer.py ".../TV Shows/The Big Bang Theory/The Big Bang Theory - S01E10.mp4" -d
+python3 Jellyfin-DvrEpisodeRenamer.py ".../TV Shows/The Big Bang Theory/The Big Bang Theory 2020702271000.mp4" -d
 ```
 
 
