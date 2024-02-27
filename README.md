@@ -1,7 +1,7 @@
 # Jellyfin-DvrEpisodeRenamer
 
 This application can be used to automatically rename a [Jellyfin](https://github.com/jellyfin/jellyfin "JellyFin on GitHub") recorded TV
-file using the metadata stored in a .nfo file which is saved alongside the
+file[^1] using the metadata stored in a .nfo file which is saved alongside the
 video file by Jellyfin's DVR functionality.
 
 >NOTE: The format will be `'[Show Name] - S[Season No]E[Episode No].[extension]'` e.g. 'The Big Bang Theory - S01E10.mp4'.
@@ -102,7 +102,7 @@ In this example the .mp4 file will be renamed, and the episode info and thumbnai
 
 ## Show Name Substitution
 
-There is a section of the python script that can be used to substitute one show name for another:
+There is a section of the python script[^2] that can be used to substitute one show name for another:
 
 e.g.
 
@@ -111,4 +111,6 @@ e.g.
 SUBSTITUTION_SHOW_NAMES = [('Rick and Morty [adult swim]', 'Rick and Morty')]
 ```
 
->NOTE: This will be moved to a config file in a future release.
+
+[^1]: Please Note: this has only been tested with UK Recrdings.
+[^2]: This will be moved to a config file in a future release. 
