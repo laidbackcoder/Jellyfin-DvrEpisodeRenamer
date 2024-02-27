@@ -42,3 +42,34 @@ unless the delete option has been used, in which case they will be deleted.
 Jellyfin can be configured to call the application once a recording has finished:
 
 _Dashboard > Live TV > Digital Recorder > Recording Post Processing_
+
+
+### Docker-Post-Recording
+
+I am a big fan of the docker-post-recording project and us it to automatically remove commercials and transcode my recordings to a .mp4 file. It is possible to configure the tool to execute the Jellyfin-DvrEpisodeRenamer script automatically once the transcoding has been finished:
+
+Copy the Jellyfin-DvrEpisodeRenamer.py file to the hooks directory in the docker container's config folder:
+
+    /config/hooks
+
+
+Whilst in the hooks folder, create a file called 'post_conversion.sh', and populate with the following:
+
+    #!/bin/sh
+    #
+    # Rename the file and handle the Meta Data post conversion
+    #
+    # The first parameter is the conversion status.  A value of 0 indicates that
+    # the video has been converted successfully.  Else, conversion failed.
+    #
+    # The second parameter is the full path to the converted video (the output).
+    #
+    
+    CONVERSION_STATUS=$1
+    CONVERTED_FILE="$2"
+    
+    if [ "$CONVERSION_STATUS" -eq 0 ]; then
+        python3 /config/hooks/Jellyfin-DvrEpisodeRenamer.py "$CONVERTED_FILE" -e .mp4 -d
+    fi
+
+This script will be executed once transcoding has been completed.
