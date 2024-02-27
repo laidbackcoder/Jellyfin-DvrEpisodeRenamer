@@ -10,7 +10,7 @@ video file by Jellyfin's DVR functionality.
 There are two modes of processing:
 
 * Single Video file
-* Whole directory (including sub-directories)
+* Whole directory Scan (including sub-directories)
 
 This is determined by the path supplied to the application when executed.
 
@@ -39,6 +39,24 @@ options:
   -e {.ts,.mp4,.m4v}, --extension {.ts,.mp4,.m4v}
                         Video File Extension (default: .ts)
 ```
+
+### Single File Example
+
+In this example, we are processing a single .ts file and deleting the episode info and thumbnail files upon successful completion:
+
+```Bash
+python3 Jellyfin-DvrEpisodeRenamer.py ".../TV Shows/The Big Bang Theory/The Big Bang Theory - S01E10.mp4" -d
+```
+
+
+### Directory Scan Example
+
+In this example, we are processing all .mp4 files in the specified directory (including sub-directories) and renaming the episode info and thumbnail files upon successful completion:
+
+```Bash
+python3 Jellyfin-DvrEpisodeRenamer.py ".../TV Shows" -e .mp4
+```
+
 
 ## Automation
 
