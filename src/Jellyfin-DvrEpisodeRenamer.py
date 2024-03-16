@@ -26,19 +26,97 @@ Help Message (-h):
                             processing (default)
     -e {.ts,.mp4,.m4v}, --extension {.ts,.mp4,.m4v}
                             Video File Extension (default: .ts)
+
+
+Example 'substitutions.json' file:
+[
+    {
+        "original": "Rick and Morty [adult swim]",
+        "replacement": "Rick and Morty"
+    }
+]
+
 """
+
 import argparse
+import json
 import os
 import re
 import xml.etree.ElementTree as xmlET
 
 
-# TODO: Move to config file
-# [('original1','substitute1'),('original2','substitute2'),..]
-SUBSTITUTION_SHOW_NAMES = []
+def __handle_args():
+    """Handle Command Line Arguments
+
+    Returns:
+        string: file path,
+        string: file extension,
+        bool: delete info file and thumbnail
+    """
+    parser = argparse.ArgumentParser(
+        description="Auto Rename Jellyfin TV Show Recordings (DVR)"
+    )
+    parser.add_argument(
+        "path",
+        type=str,
+        help="Path to File or Directory to Process"
+        )
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
+        "-d",
+        "--delete",
+        action="store_true",
+        help="Delete the episiode info file and thumbnail after processing",
+    )
+    group.add_argument(
+        "-r",
+        "--rename",
+        action="store_true",
+        help="""Rename the episiode info file and thumbnail after
+        processing (default)""",
+    )
+    parser.add_argument(
+        "-e",
+        "--extension",
+        type=str,
+        choices=[".ts", ".mp4", ".m4v"],
+        default=".ts",
+        help="Video File Extension (default: .ts)",
+    )
+    args = parser.parse_args()
+
+    # Handle input arguments
+    return args.path, args.extension, args.delete
 
 
-def process_file(video_file_path):
+def load_substitutions(substitutions_json_file):
+    """Load Substitution Show Names from JSON file
+
+    Returns:
+        dictionary: Substitution Show Names
+    """
+    try:
+        if os.path.exists(substitutions_json_file):
+            with open(substitutions_json_file, "r") as json_in:
+                return json.load(json_in)
+        else:
+            return []
+
+    except Exception as e:
+        print(
+            "Error with JSON file, substitutions disabled: {}".format(
+                e.message
+                )
+            )
+        return []
+
+
+def process_file(
+        video_file_path,
+        extn_video_file,
+        delete_info_and_thumbnail_files,
+        substitution_show_names
+        ):
     """Process a specified Video File
 
     Args:
@@ -51,20 +129,20 @@ def process_file(video_file_path):
         video_file_name = os.path.basename(video_file_path)
         path = os.path.dirname(video_file_path)
 
-        print('\nProcessing file:', video_file_name)
+        print("\nProcessing file:", video_file_name)
 
         # Check if the file is a video file
-        if video_file_name.endswith(EXTN_VIDEO_FILE):
+        if video_file_name.endswith(extn_video_file):
 
             # Get file name without extension
             recording_id = os.path.splitext(video_file_name)[0]
 
             # Generate file names and paths for all associated files
-            show_info_file_path = '{}/{}'.format(path, 'tvshow.nfo')
-            info_file_name = '{}{}'.format(recording_id, '.nfo')
-            info_file_path = '{}/{}'.format(path, info_file_name)
-            thumbnail_file_name = '{}{}'.format(recording_id, '-thumb.jpg')
-            thumbnail_file_path = '{}/{}'.format(path, thumbnail_file_name)
+            show_info_file_path = "{}/{}".format(path, "tvshow.nfo")
+            info_file_name = "{}{}".format(recording_id, ".nfo")
+            info_file_path = "{}/{}".format(path, info_file_name)
+            thumbnail_file_name = "{}{}".format(recording_id, "-thumb.jpg")
+            thumbnail_file_path = "{}/{}".format(path, thumbnail_file_name)
 
             # Check for an info file for the episode
             if os.path.exists(info_file_path):
@@ -73,160 +151,174 @@ def process_file(video_file_path):
                 if os.path.exists(show_info_file_path):
 
                     # Extract the show name from the show info file
-                    show_name = xmlET.parse(
-                        show_info_file_path
-                        ).getroot().find('title').text
+                    show_name = (
+                        xmlET.parse(
+                            show_info_file_path
+                            ).getroot().find("title").text
+                    )
 
                     # Apply any substitutions to the show name
-                    for sub in SUBSTITUTION_SHOW_NAMES:
-                        if show_name == sub[0]:
-                            show_name = sub[1]
+                    for sub in substitution_show_names:
+                        if show_name == sub["original"]:
+                            show_name = sub["replacement"]
 
-                    print('Show Name extracted:', show_name)
+                    print("Show Name extracted:", show_name)
 
                     # Extract the plot text from the episode info file
                     plot = xmlET.parse(
                         info_file_path
-                        ).getroot().find('plot').text
+                        ).getroot().find("plot").text
 
                     # Use regular expression to extract season and episode
                     # number from the plot text (adding leading zeroes if
                     # needed)
-                    match = re.search(r'S(\d+)\s*Ep(\d+)', plot)
+                    match = re.search(r"S(\d+)\s*Ep(\d+)", plot)
                     if match:
                         season = match.group(1).zfill(2)
                         episode = match.group(2).zfill(2)
                         episode_info = f"S{season}E{episode}"
-                        print('Season and Episode info extracted:',
-                              episode_info
-                              )
+                        print(
+                            "Season and Episode info extracted:",
+                            episode_info
+                            )
 
                         # Generate new name for the episode
-                        new_recording_id = '{} - {}'.format(
-                            show_name, episode_info
+                        new_recording_id = "{} - {}".format(
+                            show_name,
+                            episode_info
                             )
-                        if (new_recording_id != recording_id):
-                            new_video_file_name = '{}{}'.format(
-                                new_recording_id, EXTN_VIDEO_FILE
-                                )
-                            new_video_file_path = '{}/{}'.format(
+                        if new_recording_id != recording_id:
+                            new_video_file_name = "{}{}".format(
+                                new_recording_id, extn_video_file
+                            )
+                            new_video_file_path = "{}/{}".format(
                                 path, new_video_file_name
-                                )
+                            )
 
                             # Handle Duplicates
                             copies = 1
                             while os.path.exists(new_video_file_path):
                                 copies += 1
-                                new_video_file_name = '{}({}){}'.format(
-                                    new_recording_id, copies, EXTN_VIDEO_FILE)
-                                new_video_file_path = '{}/{}'.format(
-                                    path, new_video_file_name)
-                            if (copies > 1):
-                                new_recording_id = '{}({})'.format(
+                                new_video_file_name = "{}({}){}".format(
+                                    new_recording_id, copies, extn_video_file
+                                )
+                                new_video_file_path = "{}/{}".format(
+                                    path, new_video_file_name
+                                )
+                            if copies > 1:
+                                new_recording_id = "{}({})".format(
                                     new_recording_id, copies
-                                    )
+                                )
 
                             # Rename the video file
                             try:
-                                print('Renaming Video File: from "{}" to "{}".'
-                                      .format(
-                                          video_file_name,
-                                          new_video_file_name
-                                          )
-                                      )
+                                print(
+                                    '''Renaming Video File: from
+                                    "{}" to "{}".'''.format(
+                                        video_file_name,
+                                        new_video_file_name
+                                    )
+                                )
                                 os.rename(video_file_path, new_video_file_path)
                             except Exception as e:
                                 raise Exception(
-                                    'Unable to rename file: {}'.format(e)
+                                    "Unable to rename file: {}".format(e)
                                     )
 
                             # Check if the episiode info file and thumbnail
                             # should be deleted or renamed
-                            if (DELETE_INFO_AND_THUMBNAIL_FILES):
+                            if delete_info_and_thumbnail_files:
                                 # Delete the episode info file and thumbnail
                                 try:
-                                    print('Deleting Info File:',
-                                          info_file_name
-                                          )
+                                    print(
+                                        "Deleting Info File:",
+                                        info_file_name
+                                        )
                                     os.remove(info_file_path)
 
-                                    if (os.path.exists(thumbnail_file_path)):
-                                        print('Deleting Thumbnail File:',
-                                              thumbnail_file_name
-                                              )
+                                    if os.path.exists(thumbnail_file_path):
+                                        print(
+                                            "Deleting Thumbnail File:",
+                                            thumbnail_file_name,
+                                        )
                                         os.remove(thumbnail_file_path)
                                 except Exception as e:
                                     raise Exception(
-                                        'Unable to delete file: {}'.format(e)
-                                        )
+                                        "Unable to delete file: {}".format(e)
+                                    )
                             else:
                                 # Rename the episiode info file and thumbnail
                                 try:
-                                    new_info_file_name = '{}.nfo'.format(
+                                    new_info_file_name = "{}.nfo".format(
                                         new_recording_id
-                                        )
-                                    new_info_file_path = '{}/{}'.format(
-                                        path,
-                                        new_info_file_name
-                                        )
-                                    print('Renaming Info File: from {} to {}'
-                                          .format(
+                                    )
+                                    new_info_file_path = "{}/{}".format(
+                                        path, new_info_file_name
+                                    )
+                                    print(
+                                        """Renaming Info File: from {}
+                                        to {}""".format(
                                             info_file_name,
-                                            new_info_file_name)
-                                          )
+                                            new_info_file_name
+                                        )
+                                    )
                                     os.rename(
                                         info_file_path,
                                         new_info_file_path
                                         )
 
-                                    if (os.path.exists(thumbnail_file_path)):
-                                        new_thumbnail_file_name = '''
-                                        {}{}'''.format(
-                                            new_recording_id,
-                                            '-thumb.jpg'
+                                    if os.path.exists(thumbnail_file_path):
+                                        new_thumbnail_file_name = """
+                                        {}{}""".format(
+                                            new_recording_id, "-thumb.jpg"
                                         )
-                                        new_thumbnail_file_path = '''
-                                        {}/{}'''.format(
-                                            path,
-                                            new_thumbnail_file_name
-                                            )
+                                        new_thumbnail_file_path = """
+                                        {}/{}""".format(
+                                            path, new_thumbnail_file_name
+                                        )
                                         print(
-                                            '''Renaming Thumbnail File: from {}
-                                            to {}'''.format(
+                                            """Renaming Thumbnail File: from {}
+                                            to {}""".format(
                                                 thumbnail_file_name,
-                                                new_thumbnail_file_name)
+                                                new_thumbnail_file_name,
                                             )
+                                        )
                                         os.rename(
                                             thumbnail_file_path,
                                             new_thumbnail_file_path
-                                            )
+                                        )
                                 except Exception as e:
                                     raise Exception(
-                                        'Unable to rename file: {}'.format(e)
-                                        )
-                            print('Done.')
+                                        "Unable to rename file: {}".format(e)
+                                    )
+                            print("Done.")
                         else:
-                            raise Exception('Episode already processed')
+                            raise Exception("Episode already processed")
                     else:
                         raise Exception(
-                            '''Season and Episode info not found
-                            in episode info file'''
-                            )
+                            """Season and Episode info not found
+                            in episode info file"""
+                        )
                 else:
-                    raise Exception('No tvshow.nfo show info file found')
+                    raise Exception("No tvshow.nfo show info file found")
             else:
-                raise Exception('No matching .nfo file found for the episode')
+                raise Exception("No matching .nfo file found for the episode")
         else:
             raise Exception(
-                'Invalid file format: Must be a {} file'.format(
-                    EXTN_VIDEO_FILE
+                "Invalid file format: Must be a {} file".format(
+                    extn_video_file
                     )
-                )
+            )
     except Exception as e:
         raise Exception(e)
 
 
-def process_directory(root_directory):
+def process_directory(
+        root_directory,
+        extn_video_file,
+        delete_info_and_thumbnail_files,
+        substitution_show_names
+        ):
     """Process Video Files and Sub Directories in a specified directory
 
     Args:
@@ -239,98 +331,101 @@ def process_directory(root_directory):
     global success
     global errors
 
-    print('\nProcessing directory:', root_directory)
+    print("\nProcessing directory:", root_directory)
 
     try:
         # Loop through all files and sub directoties in the directory
         for item in os.listdir(root_directory):
-            item_path = '{}/{}'.format(root_directory, item)
+            item_path = "{}/{}".format(root_directory, item)
 
             # Check if the item being processed is a sub directory
-            if (os.path.isdir(item_path)):
+            if os.path.isdir(item_path):
                 # Process the sub directory
                 process_directory(item_path)
             else:
                 # Process the file if it has the correct video file extension
                 try:
-                    if item.endswith(EXTN_VIDEO_FILE):
-                        process_file(item_path)
+                    if item.endswith(extn_video_file):
+                        process_file(
+                            item_path,
+                            extn_video_file,
+                            delete_info_and_thumbnail_files,
+                            substitution_show_names
+                            )
                         success += 1
                 except Exception as e:
-                    print(e, '\nSkipping file...')
+                    print(e, "\nSkipping file...")
                     errors += 1
     except Exception as e:
         raise Exception(e)
 
 
-errors = 0
-success = 0
+def run():
+    errors = 0
+    success = 0
 
-# Configure the Command Line Arguments
-parser = argparse.ArgumentParser(
-    description='Auto Rename Jellyfin TV Show Recordings (DVR)'
-    )
-group = parser.add_mutually_exclusive_group()
-parser.add_argument(
-    'path',
-    type=str,
-    help='Path to File or Directory to Process'
-    )
-group.add_argument(
-    '-d',
-    '--delete',
-    action='store_true',
-    help='Delete the episiode info file and thumbnail after processing'
-    )
-group.add_argument(
-    '-r',
-    '--rename',
-    action='store_true',
-    help='''Rename the episiode info file and thumbnail after
-    processing (default)'''
-    )
-parser.add_argument(
-    '-e',
-    '--extension',
-    type=str,
-    choices=['.ts', '.mp4', '.m4v'],
-    default='.ts',
-    help='Video File Extension (default: .ts)'
-    )
-args = parser.parse_args()
+    # Load the Command Line Arguments
+    path, extn_video_file, delete_info_and_thumbnail_files = __handle_args()
 
-# Handle input arguments
-path = args.path
-EXTN_VIDEO_FILE = args.extension
-if args.delete:
-    DELETE_INFO_AND_THUMBNAIL_FILES = True
-else:
-    DELETE_INFO_AND_THUMBNAIL_FILES = False
+    substitutions_json_file = os.path.dirname(
+        os.path.realpath(__file__)
+        ) + "/substitutions.json"
 
-# Check valid path has been supplied
-if (os.path.exists(path)):
-    # Check if the path is to a directory or a file
-    if os.path.isdir(path):
-        # Process the directory
-        try:
-            process_directory(path)
-        except Exception as e:
-            print('Error:', e)
+    # Load Substitution Show Names from JSON file
+    substitution_show_names = load_substitutions(substitutions_json_file)
+
+    # Check valid path has been supplied
+    if os.path.exists(path):
+        # Check if the path is to a directory or a file
+        if os.path.isdir(path):
+            # Process the directory
+            try:
+                process_directory(
+                    path,
+                    extn_video_file,
+                    delete_info_and_thumbnail_files,
+                    substitution_show_names
+                    )
+            except Exception as e:
+                print("Error:", e)
+        else:
+            # Process the file if it has the correct video file extension
+            try:
+                if path.endswith(extn_video_file):
+                    process_file(
+                        path,
+                        extn_video_file,
+                        delete_info_and_thumbnail_files,
+                        substitution_show_names
+                        )
+                    success += 1
+            except Exception as e:
+                print(e, "\nSkipping file...")
+                errors += 1
+
+        print(
+            """\n-------------------------------------
+            ------------------------------------------"""
+        )
+        print(
+            """Finished: Successfully processed {} file(s)
+            , Failed to process {} file(s)""".format(
+                success, errors
+            )
+        )
+        print(
+            """---------------------------------------
+            ----------------------------------------\n"""
+        )
     else:
-        # Process the file if it has the correct video file extension
-        try:
-            if path.endswith(EXTN_VIDEO_FILE):
-                process_file(path)
-                success += 1
-        except Exception as e:
-            print(e, '\nSkipping file...')
-            errors += 1
+        print("\nError: Could not locate file or directory:", path)
 
-    print('''\n-------------------------------------
-          ------------------------------------------''')
-    print('''Finished: Successfully processed {} file(s)
-          , Failed to process {} file(s)'''.format(success, errors))
-    print('''---------------------------------------
-          ----------------------------------------\n''')
-else:
-    print('\nError: Could not locate file or directory:', path)
+
+if __name__ == '__main__':
+    run()
+
+
+# TODO: Update Doc Strings
+# TODO: Update Readme
+# TODO: Verify format of JSON file
+# TODO: Test
