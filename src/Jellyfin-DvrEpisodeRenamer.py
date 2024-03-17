@@ -38,11 +38,21 @@ Example 'substitutions.json' file:
 
 """
 
+# TODO: Update Doc Strings
+# TODO: Update Readme
+# TODO: Refactor .format() to f strings for consistency
+# TODO: Move Regex and Substitutions into config file
+# TODO: Verify format of JSON file
+
 import argparse
 import json
 import os
 import re
 import xml.etree.ElementTree as xmlET
+
+
+errors = 0
+success = 0
 
 
 def __handle_args():
@@ -157,12 +167,13 @@ def process_file(
                             ).getroot().find("title").text
                     )
 
+                    print("Show Name extracted:", show_name)
+
                     # Apply any substitutions to the show name
                     for sub in substitution_show_names:
                         if show_name == sub["original"]:
                             show_name = sub["replacement"]
-
-                    print("Show Name extracted:", show_name)
+                            print("Show Name substituted:", show_name)
 
                     # Extract the plot text from the episode info file
                     plot = xmlET.parse(
@@ -178,8 +189,7 @@ def process_file(
                         episode = match.group(2).zfill(2)
                         episode_info = f"S{season}E{episode}"
                         print(
-                            "Season and Episode info extracted:",
-                            episode_info
+                            "Season and Episode info extracted:", episode_info
                             )
 
                         # Generate new name for the episode
@@ -213,8 +223,8 @@ def process_file(
                             # Rename the video file
                             try:
                                 print(
-                                    '''Renaming Video File: from
-                                    "{}" to "{}".'''.format(
+                                    "Renaming Video File: from "
+                                    "'{}' to '{}'.".format(
                                         video_file_name,
                                         new_video_file_name
                                     )
@@ -231,15 +241,14 @@ def process_file(
                                 # Delete the episode info file and thumbnail
                                 try:
                                     print(
-                                        "Deleting Info File:",
-                                        info_file_name
+                                        "Deleting Info File:", info_file_name
                                         )
                                     os.remove(info_file_path)
 
                                     if os.path.exists(thumbnail_file_path):
                                         print(
-                                            "Deleting Thumbnail File:",
-                                            thumbnail_file_name,
+                                            "Deleting Thumbnail File: " +
+                                            thumbnail_file_name
                                         )
                                         os.remove(thumbnail_file_path)
                                 except Exception as e:
@@ -256,8 +265,8 @@ def process_file(
                                         path, new_info_file_name
                                     )
                                     print(
-                                        """Renaming Info File: from {}
-                                        to {}""".format(
+                                        "Renaming Info File: from "
+                                        "{} to {}".format(
                                             info_file_name,
                                             new_info_file_name
                                         )
@@ -268,17 +277,15 @@ def process_file(
                                         )
 
                                     if os.path.exists(thumbnail_file_path):
-                                        new_thumbnail_file_name = """
-                                        {}{}""".format(
-                                            new_recording_id, "-thumb.jpg"
+                                        new_thumbnail_file_name = (
+                                            f"{new_recording_id}-thumb.jpg"
                                         )
-                                        new_thumbnail_file_path = """
-                                        {}/{}""".format(
-                                            path, new_thumbnail_file_name
+                                        new_thumbnail_file_path = (
+                                            f"{path}/{new_thumbnail_file_name}"
                                         )
                                         print(
-                                            """Renaming Thumbnail File: from {}
-                                            to {}""".format(
+                                            "Renaming Thumbnail File: "
+                                            "from {} to {}".format(
                                                 thumbnail_file_name,
                                                 new_thumbnail_file_name,
                                             )
@@ -296,8 +303,8 @@ def process_file(
                             raise Exception("Episode already processed")
                     else:
                         raise Exception(
-                            """Season and Episode info not found
-                            in episode info file"""
+                            "Season and Episode info not "
+                            "found in episode info file"
                         )
                 else:
                     raise Exception("No tvshow.nfo show info file found")
@@ -361,8 +368,8 @@ def process_directory(
 
 
 def run():
-    errors = 0
-    success = 0
+    global success
+    global errors
 
     # Load the Command Line Arguments
     path, extn_video_file, delete_info_and_thumbnail_files = __handle_args()
@@ -404,28 +411,22 @@ def run():
                 errors += 1
 
         print(
-            """\n-------------------------------------
-            ------------------------------------------"""
+            "\n--------------------------------------"
+            "-----------------------------------------"
         )
         print(
-            """Finished: Successfully processed {} file(s)
-            , Failed to process {} file(s)""".format(
+            "Finished: Successfully processed "
+            "{} file(s), Failed to process {} file(s)".format(
                 success, errors
             )
         )
         print(
-            """---------------------------------------
-            ----------------------------------------\n"""
+            "-----------------------------------------"
+            "--------------------------------------\n"
         )
     else:
         print("\nError: Could not locate file or directory:", path)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run()
-
-
-# TODO: Update Doc Strings
-# TODO: Update Readme
-# TODO: Verify format of JSON file
-# TODO: Test
