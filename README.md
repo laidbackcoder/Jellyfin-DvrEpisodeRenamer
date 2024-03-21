@@ -102,15 +102,18 @@ In this example the .mp4 file will be renamed, and the episode info and thumbnai
 
 ## Show Name Substitution
 
-There is a section of the python script[^2] that can be used to substitute one show name for another:
+A 'substitutions.json' file can be created to instruct the script to substitute one show name for another when processing:
 
 e.g.
 
-```Python
-# [('original1','substitute1'),('original2','substitute2'),..]
-SUBSTITUTION_SHOW_NAMES = [('Rick and Morty [adult swim]', 'Rick and Morty')]
+```JSON
+[
+    {
+        "original": "Rick and Morty [adult swim]",
+        "replacement": "Rick and Morty"
+    }
+]
 ```
 
-
 [^1]: Please Note: this has only been tested with UK Recordings.
-[^2]: This will be moved to a config file in a future release.
+
