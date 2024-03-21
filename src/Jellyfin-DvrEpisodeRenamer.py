@@ -348,7 +348,12 @@ def process_directory(
             # Check if the item being processed is a sub directory
             if os.path.isdir(item_path):
                 # Process the sub directory
-                process_directory(item_path)
+                process_directory(
+                    item_path,
+                    extn_video_file,
+                    delete_info_and_thumbnail_files,
+                    substitution_show_names
+                    )
             else:
                 # Process the file if it has the correct video file extension
                 try:
