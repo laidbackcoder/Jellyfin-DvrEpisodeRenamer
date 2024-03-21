@@ -28,7 +28,11 @@ Help Message (-h):
                             Video File Extension (default: .ts)
 
 
-Example 'substitutions.json' file:
+A 'substitutions.json' file can be created to instruct the script to
+substitute one show name for another when processing:
+
+e.g.
+
 [
     {
         "original": "Rick and Morty [adult swim]",
