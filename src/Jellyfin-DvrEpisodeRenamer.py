@@ -38,7 +38,6 @@ Example 'substitutions.json' file:
 
 """
 
-# TODO: Refactor .format() to f strings for consistency
 # TODO: Verify format of JSON file
 
 import argparse
@@ -111,9 +110,7 @@ def load_substitutions(substitutions_json_file):
 
     except Exception as e:
         print(
-            "Error with JSON file, substitutions disabled: {}".format(
-                e.message
-                )
+            f"Error with JSON file, substitutions disabled: {e.message}"
             )
         return []
 
@@ -148,11 +145,11 @@ def process_file(
             recording_id = os.path.splitext(video_file_name)[0]
 
             # Generate file names and paths for all associated files
-            show_info_file_path = "{}/{}".format(path, "tvshow.nfo")
-            info_file_name = "{}{}".format(recording_id, ".nfo")
-            info_file_path = "{}/{}".format(path, info_file_name)
-            thumbnail_file_name = "{}{}".format(recording_id, "-thumb.jpg")
-            thumbnail_file_path = "{}/{}".format(path, thumbnail_file_name)
+            show_info_file_path = f"{path}/tvshow.nfo"
+            info_file_name = f"{recording_id}.nfo"
+            info_file_path = f"{path}/{info_file_name}"
+            thumbnail_file_name = f"{recording_id}-thumb.jpg"
+            thumbnail_file_path = f"{path}/{thumbnail_file_name}"
 
             # Check for an info file for the episode
             if os.path.exists(info_file_path):
@@ -193,47 +190,44 @@ def process_file(
                             )
 
                         # Generate new name for the episode
-                        new_recording_id = "{} - {}".format(
-                            show_name,
-                            episode_info
-                            )
+                        new_recording_id = f"{show_name} - {episode_info}"
                         if new_recording_id != recording_id:
-                            new_video_file_name = "{}{}".format(
-                                new_recording_id, extn_video_file
+                            new_video_file_name = (
+                                f"{new_recording_id}"
+                                f"{extn_video_file}"
                             )
-                            new_video_file_path = "{}/{}".format(
-                                path, new_video_file_name
+                            new_video_file_path = (
+                                f"{path}/"
+                                f"{new_video_file_name}"
                             )
 
                             # Handle Duplicates
                             copies = 1
                             while os.path.exists(new_video_file_path):
                                 copies += 1
-                                new_video_file_name = "{}({}){}".format(
-                                    new_recording_id, copies, extn_video_file
-                                )
-                                new_video_file_path = "{}/{}".format(
-                                    path, new_video_file_name
+                                new_video_file_name = (
+                                    f"{new_recording_id}({copies})"
+                                    f"{extn_video_file}"
+                                    )
+                                new_video_file_path = (
+                                    f"{path}/"
+                                    f"{new_video_file_name}"
                                 )
                             if copies > 1:
-                                new_recording_id = "{}({})".format(
-                                    new_recording_id, copies
+                                new_recording_id = (
+                                    f"{new_recording_id}({copies})"
                                 )
 
                             # Rename the video file
                             try:
                                 print(
                                     "Renaming Video File: from "
-                                    "'{}' to '{}'.".format(
-                                        video_file_name,
-                                        new_video_file_name
-                                    )
+                                    f"'{video_file_name}' to "
+                                    f"'{new_video_file_name}'."
                                 )
                                 os.rename(video_file_path, new_video_file_path)
                             except Exception as e:
-                                raise Exception(
-                                    "Unable to rename file: {}".format(e)
-                                    )
+                                raise Exception(f"Unable to rename file: {e}")
 
                             # Check if the episiode info file and thumbnail
                             # should be deleted or renamed
@@ -247,29 +241,27 @@ def process_file(
 
                                     if os.path.exists(thumbnail_file_path):
                                         print(
-                                            "Deleting Thumbnail File: " +
+                                            "Deleting Thumbnail File:",
                                             thumbnail_file_name
                                         )
                                         os.remove(thumbnail_file_path)
                                 except Exception as e:
                                     raise Exception(
-                                        "Unable to delete file: {}".format(e)
-                                    )
+                                        f"Unable to delete file: {e}"
+                                        )
                             else:
                                 # Rename the episiode info file and thumbnail
                                 try:
-                                    new_info_file_name = "{}.nfo".format(
-                                        new_recording_id
+                                    new_info_file_name = (
+                                        f"{new_recording_id}.nfo"
                                     )
-                                    new_info_file_path = "{}/{}".format(
-                                        path, new_info_file_name
+                                    new_info_file_path = (
+                                        f"{path}/{new_info_file_name}"
                                     )
                                     print(
                                         "Renaming Info File: from "
-                                        "{} to {}".format(
-                                            info_file_name,
-                                            new_info_file_name
-                                        )
+                                        f"{info_file_name} to "
+                                        f"{new_info_file_name}"
                                     )
                                     os.rename(
                                         info_file_path,
@@ -285,10 +277,8 @@ def process_file(
                                         )
                                         print(
                                             "Renaming Thumbnail File: "
-                                            "from {} to {}".format(
-                                                thumbnail_file_name,
-                                                new_thumbnail_file_name,
-                                            )
+                                            f"from {thumbnail_file_name} to "
+                                            f"{new_thumbnail_file_name}"
                                         )
                                         os.rename(
                                             thumbnail_file_path,
@@ -296,15 +286,15 @@ def process_file(
                                         )
                                 except Exception as e:
                                     raise Exception(
-                                        "Unable to rename file: {}".format(e)
-                                    )
+                                        f"Unable to rename file: {e}"
+                                        )
                             print("Done.")
                         else:
                             raise Exception("Episode already processed")
                     else:
                         raise Exception(
-                            "Season and Episode info not "
-                            "found in episode info file"
+                            "Season and Episode info not found "
+                            "in episode info file"
                         )
                 else:
                     raise Exception("No tvshow.nfo show info file found")
@@ -312,10 +302,8 @@ def process_file(
                 raise Exception("No matching .nfo file found for the episode")
         else:
             raise Exception(
-                "Invalid file format: Must be a {} file".format(
-                    extn_video_file
-                    )
-            )
+                f"Invalid file format: Must be a {extn_video_file} file"
+                )
     except Exception as e:
         raise Exception(e)
 
@@ -346,7 +334,7 @@ def process_directory(
     try:
         # Loop through all files and sub directoties in the directory
         for item in os.listdir(root_directory):
-            item_path = "{}/{}".format(root_directory, item)
+            item_path = f"{root_directory}/{item}"
 
             # Check if the item being processed is a sub directory
             if os.path.isdir(item_path):
@@ -424,9 +412,7 @@ def run():
         )
         print(
             "Finished: Successfully processed "
-            "{} file(s), Failed to process {} file(s)".format(
-                success, errors
-            )
+            f"{success} file(s), Failed to process {errors} file(s)"
         )
         print(
             "-----------------------------------------"
