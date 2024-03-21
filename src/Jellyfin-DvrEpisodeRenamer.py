@@ -38,10 +38,7 @@ Example 'substitutions.json' file:
 
 """
 
-# TODO: Update Doc Strings
-# TODO: Update Readme
 # TODO: Refactor .format() to f strings for consistency
-# TODO: Move Regex and Substitutions into config file
 # TODO: Verify format of JSON file
 
 import argparse
@@ -130,7 +127,10 @@ def process_file(
     """Process a specified Video File
 
     Args:
-        video_file_path (string): Video File Path
+        string: Directory Path
+        string: Video File Extension (.mp4, .m4v or .ts)
+        bool: Delete Info and Thumbnail Files (True = delete, False = rename)
+        dictionary: Substitution Show Names
 
     Raises:
         Exception: Generic Exception with Message
@@ -329,7 +329,10 @@ def process_directory(
     """Process Video Files and Sub Directories in a specified directory
 
     Args:
-        root_directory (string): Directory Path
+        string: Directory Path
+        string: Video File Extension (.mp4, .m4v or .ts)
+        bool: Delete Info and Thumbnail Files (True = delete, False = rename)
+        dictionary: Substitution Show Names
 
     Raises:
         Exception: Generic Exception with Message
