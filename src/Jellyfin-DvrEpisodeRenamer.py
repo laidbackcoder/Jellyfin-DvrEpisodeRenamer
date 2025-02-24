@@ -11,7 +11,7 @@ URL: https://github.com/laidbackcoder/Jellyfin-DvrEpisodeRenamer
 Help Message (-h):
 
     usage: Jellyfin-DvrEpisodeRenamer.py [-h] [-d | -r]
-                                        [-e {.ts,.mp4,.m4v}] path
+                                        [-e {.ts,.mp4,.m4v, .mkv}] path
 
     Auto Rename Jellyfin TV Show Recordings (DVR)
 
@@ -24,7 +24,7 @@ Help Message (-h):
                             after processing
     -r, --rename          Rename the episiode info file and thumbnail after
                             processing (default)
-    -e {.ts,.mp4,.m4v}, --extension {.ts,.mp4,.m4v}
+    -e {.ts,.mp4,.m4v, .mkv}, --extension {.ts,.mp4,.m4v,.mkv}
                             Video File Extension (default: .ts)
 
 
@@ -89,7 +89,7 @@ def __handle_args():
         "-e",
         "--extension",
         type=str,
-        choices=[".ts", ".mp4", ".m4v"],
+        choices=[".ts", ".mp4", ".m4v", ".mkv"],
         default=".ts",
         help="Video File Extension (default: .ts)",
     )
@@ -184,7 +184,7 @@ def process_file(
                     # Use regular expression to extract season and episode
                     # number from the plot text (adding leading zeroes if
                     # needed)
-                    match = re.search(r"S(\d+)\s*Ep(\d+)", plot)
+                    match = re.search(r"S\s*(\d+)\s*E(?:p)?\s*(\d+)", plot)
                     if match:
                         season = match.group(1).zfill(2)
                         episode = match.group(2).zfill(2)
